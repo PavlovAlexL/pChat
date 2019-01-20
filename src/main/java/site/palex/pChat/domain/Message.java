@@ -51,4 +51,9 @@ public class Message {
     public void setId(Integer id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return id.toString()+text+tag;
+    }
 }
