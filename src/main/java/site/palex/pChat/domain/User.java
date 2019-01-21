@@ -1,11 +1,17 @@
 package site.palex.pChat.domain;
 
+
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
+import java.util.Collection;
 import java.util.Set;
 
 @Entity
 @Table(name = "usr")//нельзя называть таблицы так же как класс
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -19,6 +25,32 @@ public class User {
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))   //Описывает что данное поле будет храниться в отдельной таблице user_role, и соединяться по ключу user_id
     @Enumerated(EnumType.STRING)    //Хотим этот Enum хранить в виде строки
     private Set<Role> roles;    //Сет ролей, которые мы создали заранее
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return getRoles();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return isActive();
+    }
 
     public Long getId() {
         return id;

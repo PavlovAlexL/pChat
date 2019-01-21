@@ -1,6 +1,8 @@
 package site.palex.pChat.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import site.palex.pChat.domain.Message;
+import site.palex.pChat.domain.User;
 import site.palex.pChat.repos.MessageRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,8 +39,13 @@ public class MainController {
     }
 
     @PostMapping("/main")
-    public String add(@RequestParam String text, @RequestParam String tag, Map<String, Object> model) {
-        Message message = new Message(text, tag);
+    public String add(
+            @AuthenticationPrincipal User user,
+            @RequestParam String text,
+            @RequestParam String tag,
+            Map<String, Object> model
+    ) {
+        Message message = new Message(text, tag, user);
 
         messageRepo.save(message);
 

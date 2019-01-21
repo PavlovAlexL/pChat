@@ -1,5 +1,13 @@
 package site.palex.pChat.domain;
 
-public enum Role {
-    USER;
+import org.springframework.security.core.GrantedAuthority;
+
+public enum Role implements GrantedAuthority {
+    USER;   //Значение enum являются реализацией этого класса
+
+
+    @Override
+    public String getAuthority() {
+        return name();
+    }
 }

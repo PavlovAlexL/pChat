@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import site.palex.pChat.service.UserService;
 
 import javax.sql.DataSource;
 
@@ -20,8 +21,9 @@ import javax.sql.DataSource;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
     @Autowired
-    private DataSource dataSource;
+    private UserService userService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -43,11 +45,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.jdbcAuthentication()
-                .dataSource(dataSource)   //Нужен для того, чтобы менеджер мог ходить в базу данных и искать пользователя и их роли
-                .passwordEncoder(NoOpPasswordEncoder.getInstance()) //будет шифровать парольи
-                .usersByUsernameQuery("select username, password, active from usr where username=?")    //Нужно чтобы система могла найти пользователя по его имени
-                .authoritiesByUsernameQuery("select u.username, ur.roles from usr u inner join user_role ur on u.id = ur.user_id where u.username=?");  //Помогает получить список пользователей с их ролями
+        auth.userDetailsService(userService)
+                .passwordEncoder(NoOpPasswordEncoder.getInstance());  //будет шифровать парольи
+                //.usersByUsernameQuery("select username, password, active from usr where username=?")    //Нужно чтобы система могла найти пользователя по его имени
+                //.authoritiesByUsernameQuery("select u.username, ur.roles from usr u inner join user_role ur on u.id = ur.user_id where u.username=?");  //Помогает получить список пользователей с их ролями
 
 
     }
