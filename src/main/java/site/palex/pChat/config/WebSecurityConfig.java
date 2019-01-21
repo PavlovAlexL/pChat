@@ -1,17 +1,8 @@
 package site.palex.pChat.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.context.annotation.Bean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -56,7 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .dataSource(dataSource)   //Нужен для того, чтобы менеджер мог ходить в базу данных и искать пользователя и их роли
                 .passwordEncoder(NoOpPasswordEncoder.getInstance()) //будет шифровать парольи
                 .usersByUsernameQuery("select username, password, active from usr where username=?")    //Нужно чтобы система могла найти пользователя по его имени
-                .authoritiesByUsernameQuery("select u.username, ur.roles from usr u inner join user ur on u.id = ur.user_id where u.username=?");  //Помогает получить список пользователей с их ролями
+                .authoritiesByUsernameQuery("select u.username, ur.roles from usr u inner join user_role ur on u.id = ur.user_id where u.username=?");  //Помогает получить список пользователей с их ролями
 
 
     }

@@ -10,17 +10,17 @@ import javax.persistence.Id;
 
 
 @Entity // This tells Hibernate to make a table out of this class
+//Из-за отсутствия аннотации @Table, предполагается, что сущность будет соответствовать таблице с названием Message
 public class Message {
 
-    @Id     //говорит спрингу что это поле явл. идентификатором
-    @GeneratedValue(strategy=GenerationType.AUTO)   //говорим что созданием и прочими параметрами идентификатора занимается Spring
-    private Integer id;     //говорим что идентификатор будет целым числом
+    @Id     //Свойство id аннотировано как @Id, так что JPA распознает его как ID объекта.
+    @GeneratedValue(strategy=GenerationType.AUTO)   //также аннотировано как @GeneratedValue, означая, что ID должен генерироваться автоматически.
+    private Integer id;
 
     private String text;
     private String tag;
 
-    public Message(){
-        //Если это @Entity, то обязательно должен быть конструктор без параметров
+    public Message() {  //private
     }
 
     public Message(String text, String tag) {
@@ -52,8 +52,5 @@ public class Message {
         this.id = id;
     }
 
-    @Override
-    public String toString() {
-        return id.toString()+text+tag;
-    }
+
 }

@@ -1,13 +1,13 @@
-package site.palex.pChat.domain.controller;
+package site.palex.pChat.controller;
 
-
+import site.palex.pChat.domain.Message;
+import site.palex.pChat.repos.MessageRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import site.palex.pChat.domain.Message;
-import site.palex.pChat.domain.repos.MessageRepo;
+
 
 import java.util.Map;
 
@@ -32,10 +32,6 @@ public class MainController {
         Iterable<Message> messages = messageRepo.findAll();
 
         model.put("messages", messages);
-        System.out.println("main");
-        for(Map.Entry entry : model.entrySet()){
-            System.out.println(entry.getKey());
-        }
 
         return "main";
     }
@@ -49,11 +45,7 @@ public class MainController {
         Iterable<Message> messages = messageRepo.findAll();
 
         model.put("messages", messages);
-        System.out.println(model);
-        System.out.println("add");
-        for(Map.Entry entry : model.entrySet()){
-            System.out.println(entry.getKey());
-        }
+
         return "main";
     }
 
@@ -61,7 +53,7 @@ public class MainController {
     // @RequestParam means it is a parameter from the GET or POST request
     // Выдергивает из запросов из формы или URL значения
 
-    @PostMapping("/filter")
+    @PostMapping("filter")
     public String filter(@RequestParam String filter, Map<String, Object> model) {
         Iterable<Message> messages;             //Iterable - потому что он выше в иерархии чем List
 
@@ -72,12 +64,7 @@ public class MainController {
         }
 
         model.put("messages", messages);
-                            System.out.println(model);
-        System.out.println("filter");
-        for(Map.Entry entry : model.entrySet()){
-            System.out.println(entry.getKey());
-        }
+
         return "main";
     }
-
 }

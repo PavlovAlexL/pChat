@@ -2,21 +2,21 @@
 
 <body>
 
-
-    <!--h1 inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1-->
+<div>
     <form action="/logout" method="post">
         <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
         <input type="submit" value="Sign Out"/>
     </form>
+</div>
 
-    <div>
-        <form method="post">
-            <input type="text" name="text" placeholder="Введите сообщение" />
-            <input type="text" name="tag" placeholder="Тэг">
-            <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
-            <button type="submit">Добавить</button>
-        </form>
-    </div>
+<div>
+    <form method="post">
+        <input type="text" name="text" placeholder="Введите сообщение" />
+        <input type="text" name="tag" placeholder="Тэг">
+        <input type="hidden" name="_csrf" value="{{_csrf.token}}" />
+        <button type="submit">Добавить</button>
+    </form>
+</div>
 
     <div>Список сообщений</div>
 

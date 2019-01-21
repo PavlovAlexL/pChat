@@ -1,0 +1,158 @@
+/**
+Spring Framework и работа с базами данных: Spring Data JPA
+
+
+                    Классы-сущности (Entities)
+
+Классы-сущности дополняются стандартными для JPA аннотациями.
+    @Entity указывает, что данный класс должен быть спроецирован в БД
+    @Id указывает, что свойство id является первичным ключом
+    @Column позволяет произвести более тонкую настройку проецирования свойства email класса в колонку таблицы БД
+
+                    Репозитории
+
+Главными компонентами для взаимодействий с БД в Spring Data являются репозитории.
+Каждый репозиторий работает со своим классом-сущностью.
+Самым простым способом создания репозитория является создание интерфейса с наследованием от CrudRepository, как показано в примере:
+    PersonRepository.java
+    public interface PersonRepository extends CrudRepository<Person, String> {
+    }
+Первый тип (Person), переданный в дженерик CrudRepository — класс-сущность, с которым должен работать данный репозиторий, второй (String) — тип первичного ключа.
+Никаких дополнительных аннотаций для работы данного репозитория не требуется, более того, не требуется даже реализация.
+При инициализации контекста приложения Spring Data найдёт данный интерфейс и самостоятельно сгенерирует компонент (bean), реализующий данный интерфейс.
+
+Существует несколько типов репозиториев, различающихся по набору возможностей:
+
+    CrudRepository, указанный в примере, предоставляет базовый набор методов для доступа к данным. Данный интерфейс является универсальным и может быть использован не только в связке с JPA.
+    Repository — базовый тип репозиториев, не содержит каких-либо методов, так же является универсальным.
+    PagingAndSortingRepository — универсальный интерфейс, расширяющий CrudRepository и добавляющий поддержку пейджинации и сортировки.
+    JpaRepository — репозиторий, добавляющий возможности, специфичные для JPA.
+
+И две реализации, которые можно использовать для каких-нибудь нетривиальных задач, вроде написания реализации какого-нибудь метода с нестандартным поведением:
+
+    QueryDslJpaRepository — реализация JpaRepository для взаимодействия с QueryDsl.
+    SimpleJpaRepository — простая реализация JpaRepository.
+
+
+                    Запросы
+
+Стандартный набор методов для работы с данными, предоставляемый Spring Data, достаточно лаконичен.
+Мы можем найти все записи класса Person или найти запись по первичному ключу.
+А что, если нам требуется найти запись Person по email? Данную задачу можно решить несколькими способами.
+
+
+    Аннотация @NamedQuery в классе-сущности
+
+Стандартное для JPA решение  описать именованный запрос в классе-сущности:
+Person.java
+
+    @NamedQueries(
+            @NamedQuery(name = "Person.queryByEmail", query = "from Person p where p.email = ?1")
+    )
+    pubic class Person {
+        // лишний код опущен
+    }
+
+    @NamedQueries(
+            @NamedQuery(name = "Person.queryByEmail", query = "from Person p where p.email = ?1")
+    )
+    pubic class Person {
+        // лишний код опущен
+    }
+
+Останется только в репозитории добавить метод queryByEmail:
+PersonRepository.java
+Java
+public interface PersonRepository extends CrudRepository<Person, String> {
+
+        Person queryByEmail(String email);
+    }
+
+
+    public interface PersonRepository extends CrudRepository<Person, String> {
+
+        Person queryByEmail(String email);
+    }
+
+Главный минус такого подхода — большое количество @NamedQuery в классе-сущности.
+Аннотация @Query в репозитории
+
+Альтернативный вариант — описывать запросы в репозитории:
+PersonRepository.java
+Java
+public interface PersonRepository extends CrudRepository<Person, String> {
+
+        @Query("from Person p where p.email = ?")
+        Person queryByEmail(String email);
+    }
+
+public interface PersonRepository extends CrudRepository<Person, String> {
+
+        @Query("from Person p where p.email = ?")
+        Person queryByEmail(String email);
+    }
+
+Выглядит значительно удобнее, так как именованные запросы в данном случае привязаны к конкретным методам.
+Волшебные методы
+
+Ещё один способ создания запросов, реализованный в Spring Data — волшебные методы. Если в репозитории существуют методы, поведение которых не описано именованными запросами, а так же имена которых начинаются с findBy, countBy или deleteBy, то Spring Data автоматически преобразует их именованные запросы. Например, следующий метод будет преобразован в запрос «from Person p where name like ?»:
+PersonRepository.java
+Java
+public interface PersonRepository extends CrudRepository<Person, String> {
+
+         List<Person> findByNameLike(String email);
+    }
+
+public interface PersonRepository extends CrudRepository<Person, String> {
+
+        List<Person> findByNameLike(String email);
+    }
+
+Данный способ предпочтителен для описания запросов, но до тех пор, пока запрос не будет сильно сложным.
+Тестирование
+
+Тестировать необходимо самостоятельно описанные методы,  в то время как стандартные методы репозиториев в тестировании не нуждаются (логика их работы протестирована уже разработчиками Spring Data). Соответственно, в данном случае применимо только интеграционное тестирование. Короткий пример тестирования нашего репозитория:
+PersonRepositoryIntegrationTest.java
+Java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PersonRepositoryIntegrationTest {
+
+    @Autowired
+    private PersonRepository personRepository;
+
+    @Test
+    public void findByEmailWhenPersonExistsShouldReturnIt() {
+        List<Person> persons = personRepository.findByNameLike("J%");
+        assertEquals(2, persons.size());
+    }
+}
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PersonRepositoryIntegrationTest {
+
+    @Autowired
+    private PersonRepository personRepository;
+
+    @Test
+    public void findByEmailWhenPersonExistsShouldReturnIt() {
+        List<Person> persons = personRepository.findByNameLike("J%");
+        assertEquals(2, persons.size());
+    }
+}
+
+Полезные ссылки
